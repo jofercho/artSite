@@ -4,21 +4,41 @@ window.onload = function() {
     logo();
     setBackGrounds(colorThief, elements);
     gallery(elements);
+
+
+    let test = document.getElementsByClassName("menuItem");
+    for (let i = 0; i < test.length; i++) {
+        test[i].addEventListener("mouseenter", event => onMouseEnter(event.target), false);
+        // test[i].addEventListener("mouseover", event => onMouseHover(event.target), false);
+        test[i].addEventListener("mouseleave", event => onMouseOut(event.target), false);
+    }
+
 }
 
-// const fac = new FastAverageColor();
+var onMouseEnter = function(el) {
+    animateMenuItem(el, 1.3, 700, 400, 0, '7px', '5px');
+}
+
+var onMouseHover = function(el) {
+    console.log("on mouse hover");
+}
+
+
+var onMouseOut = function(el) {
+    animateMenuItem(el, 1.0, 600, 300, 0, 0, '20px');
+}
+
+const colors = new Array();
 
 function logo() {
-    console.log('onload logo');
-    // var elements = document.querySelectorAll('#bio');
     anime({
         targets: '#svgLogo path',
         strokeDashoffset: [anime.setDashoffset, 0],
         easing: 'easeInOutSine',
         duration: 5000,
-        delay: function(el, i) { return i * 250 },
+        delay: function(el, i) { return i * 450 },
         direction: 'alternate',
-        fill: `#cccece`,
+        fill: '#f1f8f8',
         loop: true
     });
 }
@@ -45,6 +65,16 @@ function gallery(elements) {
             }
             elements[next].style.opacity = 1;
             anim.animatables[0].target = elements[top];
+
+            anime({
+                targets: '.logo',
+                targets: '.logo, .menuItems, .fab',
+                // targets: '.logo, .menuItem a',
+                delay: 3000,
+                background: colors[next],
+                opacity: [0.8, 0.9, 0.8],
+                easing: 'easeInOutQuad',
+            });
         },
     });
 }
@@ -54,15 +84,28 @@ function setBackGrounds(colorThief, elements) {
     for (let i = 0; i < elements.length; i++) {
         let img = elements[i].children[0];
         let color = colorThief.getColor(img);
+        let pallet = colorThief.getPalette(img);
+        console.log('pallet ' + pallet);
         let radialGradient = 'radial-gradient(rgb(' +
             color[0] + ', ' +
             color[1] + ', ' +
             color[2] + ') 20%, rgb(239, 233, 245) 100%)';
+
+        let radialGradient2 = 'radial-gradient(rgb(239, 233, 245) 10%, rgb(' +
+            color[0] + ', ' +
+            color[1] + ', ' +
+            color[2] + ') 100%)';
         let bgColor = 'rgb(' +
             color[0] + ', ' +
             color[1] + ', ' +
             color[2] + ')';
-        console.log("bgColor " + bgColor);
+
+        let linearGradient = 'linear-gradient(45deg, rgb(' +
+            color[0] + ', ' +
+            color[1] + ', ' +
+            color[2] + ') 20%, rgb(239, 233, 245) 80%)';
+        colors.push(bgColor);
+        // console.log("bgColor " + bgColor);
         let frame = 'frame' + i;
         document.getElementById(frame).style.background = radialGradient;
         // document.getElementById(frame).style.background = bgColor;
@@ -89,3 +132,15 @@ function colorToString(colorArray) {
 //             console.log(e);
 //         });
 // }
+
+function animateMenuItem(el, scale, duration, elasticity, translateY, translateX, borderRadius) {
+    anime.remove(el);
+    anime({
+        targets: el,
+        scale: scale,
+        duration: duration,
+        elasticity: elasticity,
+        translateX: translateX,
+        translateY: translateY
+    });
+}
