@@ -1,9 +1,29 @@
 window.onload = function() {
-    var elements = document.querySelectorAll('.frame');
-    const colorThief = new ColorThief();
-    logo();
-    setBackGrounds(colorThief, elements);
-    gallery(elements);
+    fetch('assets/logo.svg')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('svgContainer').innerHTML = data;
+        });
+
+    fetch('components/gallery/gallery.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('gallery').innerHTML = data;
+            var elements = document.querySelectorAll('.frame');
+            console.log("frames ",elements);
+            gallery(elements);
+            const colorThief = new ColorThief();
+            logo();
+            setBackGrounds(colorThief, elements);
+            
+
+        });
+
+    // var elements = document.querySelectorAll('.frame');
+    // const colorThief = new ColorThief();
+    // logo();
+    // setBackGrounds(colorThief, elements);
+    // gallery(elements);
 
 
     let test = document.getElementsByClassName("menuItem");
@@ -83,42 +103,33 @@ function setBackGrounds(colorThief, elements) {
     let backgrounds = new Array(elements.length);
     for (let i = 0; i < elements.length; i++) {
         let img = elements[i].children[0];
-        let color = colorThief.getColor(img);
-        let pallet = colorThief.getPalette(img);
-        console.log('pallet ' + pallet);
-        let radialGradient = 'radial-gradient(rgb(' +
-            color[0] + ', ' +
-            color[1] + ', ' +
-            color[2] + ') 20%, rgb(239, 233, 245) 100%)';
 
-        let radialGradient2 = 'radial-gradient(rgb(239, 233, 245) 10%, rgb(' +
-            color[0] + ', ' +
-            color[1] + ', ' +
-            color[2] + ') 100%)';
-        let bgColor = 'rgb(' +
-            color[0] + ', ' +
-            color[1] + ', ' +
-            color[2] + ')';
+        // Ensure the image is fully loaded before processing
+        img.onload = function () {
+            if (img.width > 0 && img.height > 0) { // Check if the image has valid dimensions
+                try {
+                    let color = colorThief.getColor(img);
+                    let radialGradient = 'radial-gradient(rgb(' +
+                        color[0] + ', ' +
+                        color[1] + ', ' +
+                        color[2] + ') 20%, rgb(239, 233, 245) 100%)';
 
-        let linearGradient = 'linear-gradient(45deg, rgb(' +
-            color[0] + ', ' +
-            color[1] + ', ' +
-            color[2] + ') 20%, rgb(239, 233, 245) 80%)';
-        colors.push(bgColor);
-        // console.log("bgColor " + bgColor);
-        let frame = 'frame' + i;
-        document.getElementById(frame).style.background = radialGradient;
-        // document.getElementById(frame).style.background = bgColor;
+                    let frame = 'frame' + i;
+                    document.getElementById(frame).style.background = radialGradient;
+                    colors.push('rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')');
+                } catch (error) {
+                    console.error(`Error processing image in frame${i}:`, error);
+                }
+            } else {
+                console.warn(`Image in frame${i} has invalid dimensions (width: ${img.width}, height: ${img.height}).`);
+            }
+        };
 
+        // If the image is already loaded (cached), trigger the `onload` manually
+        if (img.complete) {
+            img.onload();
+        }
     }
-}
-
-function colorToString(colorArray) {
-    let bgColorString = 'rgb(' +
-        colorArray[0] + ', ' +
-        colorArray[1] + ', ' +
-        colorArray[2] + ');'
-    return bgColorString;
 }
 
 // function getAvgColor() {
